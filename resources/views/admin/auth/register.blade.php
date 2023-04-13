@@ -45,14 +45,20 @@
                                 name="password_confirmation" required />
             </div>
 
-            <select class="block mt-1 w-full" name="role_id" id="role_id">
-                <option selected value="2">Donatur</option>
-                {{-- <option value="2">Donatur</option> --}}
-            </select>
+            <!-- Name -->
+            <div class="mt-4">
+                <x-label for="name" :value="__('Role')" />
+
+                <select class="block mt-1 w-full" name="role_id" id="role_id">
+                    <option selected value="1">Admin</option>
+                    {{-- <option value="2">Donatur</option> --}}
+                </select>
+                {{-- <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus /> --}}
+            </div>
 
             <div class="flex items-center justify-end mt-4">
-                <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register.badan-amal') }}">
-                    {{ __('Register as Badan Amal') }}
+                <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register') }}">
+                    {{ __('Register as Donatur') }}
                 </a>
 
 
