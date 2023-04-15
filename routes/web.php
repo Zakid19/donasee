@@ -25,21 +25,19 @@ require __DIR__.'/auth.php';
 
 
 Route::middleware('guest')->group(function() {
-
     // Register Admin Badan Amal
     Route::get('admin/register', [AuthController::class, 'register'])->name('register.badan-amal');
 });
 
+// Role : Admin Badan Amal
+Route::group(['middleware' => 'role:admin'], function() {
+    Route::get('admin/register/badan-amal', [BadanAmalController::class, 'create'])->name('create');
+});
 
 Route::group(['middleware' => 'auth'],  function() {
 
     // Role : Admin Badan Amal
     Route::group(['middleware' => 'role:admin'], function() {
-
-        Route::group(['middleware' => 'guest'],  function() {
-            Route::get('admin/register/badan-amal', [BadanAmalController::class, 'create'])->name('create');
-        });
-
         Route::get('/dashboard', function () {
             return view('dashboard');
         })->name('dashboard');

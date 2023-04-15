@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function create()
     {
-        return view('auth.login');
+        return response()->json(['Message' => 'Anda Harus login terlebih dulu'],201);
+        // return view('auth.login');
     }
 
     /**
@@ -32,7 +34,15 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        $user = User::where('email', $request->email)->firstOrFail();
+        $token = $user->createToken('myapptoken')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login success',
+            'access_token' => $token,
+            'token_type' => 'Bearer'
+        ]);
+        // return redirect()->intended(RouteServiceProvider::HOME);
     }
 
     /**
@@ -49,6 +59,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        // $user = User::where('email', $request->email)->firstOrFail();
+        // $token = $user->createToken('myapptoken')->plainTextToken;
+
+        Auth::user()->tokens()->delete();
+        $response = ['message' => 'You have been successfully logged out!'];
+        return response($response, 200);
+
+        // return redirect('/');
     }
 }

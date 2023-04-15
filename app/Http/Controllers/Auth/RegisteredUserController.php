@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Str;
 
 class RegisteredUserController extends Controller
 {
@@ -20,6 +21,7 @@ class RegisteredUserController extends Controller
      */
     public function create()
     {
+        // return response()->json(['Message' => 'Berhasil masuk halaman register'],201);
         return view('auth.register');
     }
 
@@ -33,7 +35,6 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -45,16 +46,40 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role_id' => $request->role_id,
+            // 'api_token' => Str::random(80),
         ]);
+
+        $token = $user->createToken('myapptoken')->plainTextToken;
 
         event(new Registered($user));
 
         Auth::login($user);
 
         if ($user->role_id == '1') {
-            return redirect(RouteServiceProvider::ADMIN);
+            return response()->json([
+                'admin' => true,
+                'date' => $user,
+                'access_token' => $token,
+                'token_type' => 'Bearer'
+            ], 201);
+
+        } elseif ($user) {
+            return response()->json([
+                'donatur' => true,
+                'data' => $user,
+                'access_token' => $token,
+                'token_type' => 'Bearer'
+            ], 201);
         }
 
-        return redirect(RouteServiceProvider::HOME);
+        return response()->json([
+            'success' => false,
+        ], 409);
+
+        // if ($user->role_id == '1') {
+        //     return redirect(RouteServiceProvider::ADMIN);
+        // }
+
+        // return redirect(RouteServiceProvider::HOME);
     }
 }
